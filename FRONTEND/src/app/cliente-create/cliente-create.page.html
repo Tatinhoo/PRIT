@@ -1,0 +1,63 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="primary">
+      <ion-button routerDirection="root" 
+      routerLink="/cliente-list" color="danger">
+        <ion-icon name="close-circle" size="large"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Cadastro Cliente</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <form [formGroup]="clienteForm">
+    <ion-list>
+      <ion-item>
+        <ion-input label="Nome" 
+        formControlName="nome" />
+      </ion-item>
+      <ion-item>
+        <ion-label>Data de Nascimento</ion-label>
+        <ion-datetime-button datetime="datetime" />
+      </ion-item>
+      <ion-item>
+        <ion-input label="E-mail" 
+        formControlName="email" />
+      </ion-item>
+      <ion-item>
+        <ion-input
+          label="CPF"
+          type="tel"
+          placeholder=""
+          formControlName="cpf"
+        />
+      </ion-item>
+      <ion-item>
+        <ion-input type="password" label="Senha" 
+        formControlName="senha" />
+      </ion-item>
+    </ion-list>
+    <ion-button (click)="cadastrar()" [disabled]="!clienteForm.valid">
+      <ion-icon name="checkmark-outline"></ion-icon>
+    </ion-button>
+    
+    <ion-modal [keepContentsMounted]="true">
+      <ng-template>
+        <ion-datetime
+          id="datetime"
+          presentation="date"
+          formControlName="dataNasc"
+          [formatOptions]="{
+        date: {
+          year: 'numeric',
+          month: 'long',
+          day: '2-digit',
+        },
+
+      }"
+        ></ion-datetime>
+      </ng-template>
+    </ion-modal>
+  </form>
+</ion-content>
