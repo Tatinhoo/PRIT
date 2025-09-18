@@ -1,64 +1,75 @@
+import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 
 interface Cliente {
-    readonly id: number
+    readonly idCliente: number
     nome: string
     dataNasc: string
     email: string
-    cpf: string,
+    cpf: string
     senha: string
 }
 
 let clientes: Cliente[] = []
-let proxId: number = 1
+
+const prisma = new PrismaClient();
 
 export const ClienteController = {
 
-    async getAll(requesicao: Request, resposta: Response): Promise<any> {
-        return resposta.json(clientes)
-    },
-    async create(requesicao: Request, resposta: Response): Promise<any> {
-        const { nome, dataNasc, email, senha, cpf } = requesicao.body
-
-        if (!nome || !dataNasc || !email || !senha || !cpf) {
-            return resposta.status(400).json({ error: "Todos os campos são obrigatorios" })
-
+   async getAll(requisicao: Request, resposta: Response):Promise<any>{
+        try {
+            const clientes = await prisma.cliente.findMany();
+            return resposta.json(clientes);            
+        } catch (error) {
+            console.log(error)
+            resposta.status(500).json({error: "Error ao buscar todos os clientes"})
         }
-        else {
-            const Cliente: Cliente = {
-                id: proxId++,
+    },
+
+    async create(requisicao: Request, resposta: Response):Promise<any>{
+        try {
+            const{
                 nome,
-                dataNasc,
+                cpf,
+                data_nascimento,
                 email,
                 senha,
-                cpf
-            }
-            clientes.push(Cliente)
-            return resposta.status(201).json(Cliente)
+                avaliacao
+             } = requisicao.body
+             const cliente = await prisma.cliente.create({
+                data: {
+                    nome,
+                    cpf,
+                    data_nascimento,
+                    email,
+                    senha,
+                    avaliacao
+                }
+             })
+             return resposta.json(cliente)
+
+        } catch (error) {
+            console.log(error)
+            resposta.status(500).json({error: "Error ao criar o cliente"})
         }
     },
-    async getById(requesicao: Request, resposta: Response): Promise<any> {
-           
+
+    async getByNome(requisicao: Request, resposta: Response): Promise<any> {
         try {
+            const nomeBusca: string = requisicao.params.nome;
 
-        const { id } = requesicao.params
-        if (!id) {
-            return resposta.status(400).json({ error: "O id é necessario." })
-        }
-        else {
-            let idBusca: number = parseInt(id)
-            let ClienteBusca: Cliente | undefined = clientes.find(item => item.id == idBusca)
+            const resultados: any = await prisma.cliente.findMany({
+                where: {
+                    nome: {
+                        contains: nomeBusca
+                    }
+                }
+            })
 
-            if (ClienteBusca) {
-                return resposta.status(200).json(ClienteBusca)
-            }
-            else {
-                return resposta.status(400).json({ error: "Não há Cliente com esse id" })
-            }
-        }
-        
-    } catch (error) {
-              console.log("Houve um erro " + error)   
+            return resposta.json(resultados)
+        } catch (error) {
+            console.log(error)
+            resposta.status(500).json({ error: "Error ao buscar cliente por nome." })
         }
     },
 
@@ -76,14 +87,14 @@ export const ClienteController = {
         }
         else {
             const idBusca: number = parseInt(id)
-            const ClienteBusca: number | undefined = clientes.findIndex(item => item.id == idBusca)
+            const ClienteBusca: number | undefined = clientes.findIndex(item => item.idCliente == idBusca)
 
             if (ClienteBusca == -1 || ClienteBusca == undefined) {
                 return resposta.status(400).json({ error: "Id invalido" })
             }
             else {
                 clientes[ClienteBusca] = {
-                    id: idBusca,
+                    idCliente: idBusca,
                     nome,
                     dataNasc,
                     email,
@@ -99,82 +110,56 @@ export const ClienteController = {
 
     },
 
-    async delete(requesicao: Request, resposta: Response): Promise<any>{
-
+     async delete(requisicao: Request, resposta: Response):Promise<any>{
         try {
+            const idBusca:number = parseInt(requisicao.params.idCliente)
+
+            const clienteDeletado = await prisma.cliente.delete({
+                where: {
+                    idcliente: idBusca
+                }
+            })
+
+            return resposta.json(clienteDeletado)
             
-        
-        const {id} = requesicao.params;
-
-        if(!id){
-            return resposta.status(400).json({error: "O id é invalido."})
-        }
-
-        const idBusca = parseInt(id)
-        const indice = clientes.findIndex(Cliente => Cliente.id == idBusca)
-
-        if(indice == -1 || indice == undefined){
-            return resposta.status(400).json({error: "O id é invalido."})
-        }
-
-        clientes.splice(indice, 1)
-        return resposta.status(200).json({mensagem: "Cliente removido com sucesso"})
-        } 
-
-        catch (error) {
-         console.log("Houve um erro" + error)   
+        } catch (error) {
+            console.log(error)
+            resposta.status(500).json({error: "Error ao deletar o aluno"})
         }
     },
 
-    async getByName(requisicao: Request, resposta: Response): Promise<any>{
-
+    async getById(requisicao: Request, resposta: Response):Promise<any>{
         try {
+            const idBusca:number = parseInt(requisicao.params.idCliente)
+
+            const clienteResultado = await prisma.cliente.findUnique({
+                where: {
+                    idcliente: idBusca
+                }
+            })
+
+            return resposta.json(clienteResultado)
             
-            const {nome} = requisicao.params
-
-            if(!nome){
-                return resposta.status(400).json({erro: "nome invalido"})
-            }
-
-            const clientesEncontrados: Cliente[] = clientes.filter(Cliente => 
-                Cliente.nome.toLocaleUpperCase().includes(nome.toLocaleUpperCase())
-            )
-
-            if(clientesEncontrados.length > 0){
-                return resposta.status(200).json(clientesEncontrados)
-            }
-            else{
-                return resposta.status(400).json({error: "Não há clientes com este nome"})
-            }
-            } catch (error) {
-                console.log("Houve um erro" + error)   
-            
+        } catch (error) {
+            console.log(error)
+            resposta.status(500).json({error: "Error ao buscar o aluno pelo id"})
         }
     },
-
-    async getByCPF(requisicao: Request, resposta: Response): Promise<any>{
-
+   async getByCPF(requisicao: Request, resposta: Response):Promise<any>{
         try {
+            const cpfBusca:string = requisicao.params.cpf
+
+            const clienteResultado = await prisma.cliente.findUnique({
+                where: {
+                    cpf: cpfBusca
+                }
+            })
+
+            return resposta.json(clienteResultado)
             
-            const {cpf} = requisicao.params
-
-            if(!cpf){
-                return resposta.status(400).json({erro: "nome invalido"})
-            }
-
-            const clientesEncontrados: Cliente[] = clientes.filter(Cliente => 
-                Cliente.cpf.toLocaleUpperCase().includes(cpf.toLocaleUpperCase())
-            )
-
-            if(clientesEncontrados.length > 0){
-                return resposta.status(200).json(clientesEncontrados)
-            }
-            else{
-                return resposta.status(400).json({error: "Não há clientes com este cpf"})
-            }
-            } catch (error) {
-            
+        } catch (error) {
+            console.log(error)
+            resposta.status(500).json({error: "Error ao buscar o aluno pelo id"})
         }
-    }
-    
+    },
 }

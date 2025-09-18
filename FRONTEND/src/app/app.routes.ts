@@ -18,4 +18,12 @@ export const routes: Routes = [
     path: 'cliente-list',
     loadComponent: () => import('./cliente-list/cliente-list.page').then( m => m.ClienteListPage)
   },
+  {
+    path: 'login',
+    loadComponent: () => import('./login/login.page').then( m => m.LoginPage)
+  },
+  {
+    path: 'servico-create',
+    loadComponent: () => import('./servico-create/servico-create.page').then( m => m.ServicoCreatePage)
+  },
 ];

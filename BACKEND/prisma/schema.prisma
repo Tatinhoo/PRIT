@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model administrador {
+  cpf             Int      @unique(map: "cpf_UNIQUE")
+  nome            String   @db.VarChar(77)
+  email           String   @unique(map: "email_UNIQUE") @db.VarChar(70)
+  data_nascimento DateTime @db.Date
+  senha           String   @db.VarChar(45)
+  idadministrador Int      @id @unique(map: "idadministrador_UNIQUE") @default(autoincrement())
+}
+
+model avaliacao {
+  freelancer_idfreelancer Int        @unique(map: "freelancer_idfreelancer_UNIQUE") @default(autoincrement())
+  cliente_idcliente       Int        @unique(map: "cliente_idcliente_UNIQUE")
+  data                    String     @db.VarChar(45)
+  nota                    Int
+  descricao               String     @db.VarChar(300)
+  idavaliacao             Int        @unique(map: "idavaliacao_UNIQUE")
+  cliente                 cliente    @relation(fields: [cliente_idcliente], references: [idcliente], onDelete: NoAction, onUpdate: NoAction, map: "fk_freelancer_has_cliente_cliente1")
+  freelancer              freelancer @relation(fields: [freelancer_idfreelancer], references: [idfreelancer], onDelete: NoAction, onUpdate: NoAction, map: "fk_freelancer_has_cliente_freelancer")
+
+  @@id([freelancer_idfreelancer, cliente_idcliente, idavaliacao])
+  @@index([cliente_idcliente], map: "fk_freelancer_has_cliente_cliente1_idx")
+  @@index([freelancer_idfreelancer], map: "fk_freelancer_has_cliente_freelancer_idx")
+}
+
+model categoria {
+  idcategoria Int      @id @unique(map: "idcategoria_UNIQUE") @default(autoincrement())
+  nome        String   @db.VarChar(77)
+  servico     servico?
+}
+
+model cliente {
+  idcliente       Int        @id @unique(map: "idcliente_UNIQUE") @default(autoincrement())
+  cpf             String     @unique(map: "CPF_UNIQUE") @db.VarChar(45)
+  nome            String     @db.VarChar(77)
+  email           String     @unique(map: "email_UNIQUE") @db.VarChar(70)
+  data_nascimento DateTime   @db.Date
+  senha           String     @db.VarChar(45)
+  avaliacao       avaliacao?
+}
+
+model freelancer {
+  idfreelancer    Int        @id @default(autoincrement())
+  cpf             Int        @unique(map: "CPF_UNIQUE")
+  nome            String     @db.VarChar(77)
+  email           String     @unique(map: "email_UNIQUE") @db.VarChar(70)
+  data_nascimento DateTime   @db.Date
+  senha           String     @db.VarChar(45)
+  avaliacao       avaliacao?
+  servico         servico?
+}
+
+model servico {
+  categoria_idcategoria   Int        @unique(map: "categoria_idcategoria_UNIQUE") @default(autoincrement())
+  freelancer_idfreelancer Int        @unique(map: "freelancer_idfreelancer_UNIQUE")
+  descricao               String     @db.VarChar(400)
+  idservico               Int        @unique(map: "idservico_UNIQUE")
+  categoria               categoria  @relation(fields: [categoria_idcategoria], references: [idcategoria], onDelete: NoAction, onUpdate: NoAction, map: "fk_categoria_has_freelancer_categoria1")
+  freelancer              freelancer @relation(fields: [freelancer_idfreelancer], references: [idfreelancer], onDelete: NoAction, onUpdate: NoAction, map: "fk_categoria_has_freelancer_freelancer1")
+
+  @@id([categoria_idcategoria, freelancer_idfreelancer, idservico])
+  @@index([categoria_idcategoria], map: "fk_categoria_has_freelancer_categoria1_idx")
+  @@index([freelancer_idfreelancer], map: "fk_categoria_has_freelancer_freelancer1_idx")
+}
