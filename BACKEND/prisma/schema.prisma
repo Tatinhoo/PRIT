@@ -8,65 +8,65 @@ datasource db {
 }
 
 model administrador {
+  idAdministrador Int      @id @unique(map: "idAdministrado_UNIQUE") @default(autoincrement())
   cpf             Int      @unique(map: "cpf_UNIQUE")
   nome            String   @db.VarChar(77)
+  dataNasc        DateTime @db.Date
+  senha           String   @db.VarChar(77)
   email           String   @unique(map: "email_UNIQUE") @db.VarChar(70)
-  data_nascimento DateTime @db.Date
-  senha           String   @db.VarChar(45)
-  idadministrador Int      @id @unique(map: "idadministrador_UNIQUE") @default(autoincrement())
 }
 
 model avaliacao {
-  freelancer_idfreelancer Int        @unique(map: "freelancer_idfreelancer_UNIQUE") @default(autoincrement())
-  cliente_idcliente       Int        @unique(map: "cliente_idcliente_UNIQUE")
-  data                    String     @db.VarChar(45)
-  nota                    Int
-  descricao               String     @db.VarChar(300)
-  idavaliacao             Int        @unique(map: "idavaliacao_UNIQUE")
-  cliente                 cliente    @relation(fields: [cliente_idcliente], references: [idcliente], onDelete: NoAction, onUpdate: NoAction, map: "fk_freelancer_has_cliente_cliente1")
-  freelancer              freelancer @relation(fields: [freelancer_idfreelancer], references: [idfreelancer], onDelete: NoAction, onUpdate: NoAction, map: "fk_freelancer_has_cliente_freelancer")
+  cliente_idCliente      Int        @unique(map: "cliente_idCliente_UNIQUE")
+  avaliacao_idFreelancer Int        @unique(map: "avaliacao_idFreelancer_UNIQUE")
+  dataAvaliacao          DateTime   @db.Date
+  nota                   Int
+  descricao              String     @db.VarChar(200)
+  idAvaliacao            Int        @unique(map: "idAvaliacao_UNIQUE") @default(autoincrement())
+  freelancer             freelancer @relation(fields: [avaliacao_idFreelancer], references: [idFreelancer], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_has_avaliacao_avaliacao1")
+  cliente                cliente    @relation(fields: [cliente_idCliente], references: [idCliente], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_has_avaliacao_cliente1")
 
-  @@id([freelancer_idfreelancer, cliente_idcliente, idavaliacao])
-  @@index([cliente_idcliente], map: "fk_freelancer_has_cliente_cliente1_idx")
-  @@index([freelancer_idfreelancer], map: "fk_freelancer_has_cliente_freelancer_idx")
+  @@id([idAvaliacao, cliente_idCliente, avaliacao_idFreelancer])
+  @@index([avaliacao_idFreelancer], map: "fk_cliente_has_avaliacao_avaliacao1_idx")
+  @@index([cliente_idCliente], map: "fk_cliente_has_avaliacao_cliente1_idx")
 }
 
 model categoria {
-  idcategoria Int      @id @unique(map: "idcategoria_UNIQUE") @default(autoincrement())
+  idCategoria Int      @id @unique(map: "idCategoria_UNIQUE") @default(autoincrement())
   nome        String   @db.VarChar(77)
   servico     servico?
 }
 
 model cliente {
-  idcliente       Int        @id @unique(map: "idcliente_UNIQUE") @default(autoincrement())
-  cpf             String     @unique(map: "CPF_UNIQUE") @db.VarChar(45)
-  nome            String     @db.VarChar(77)
-  email           String     @unique(map: "email_UNIQUE") @db.VarChar(70)
-  data_nascimento DateTime   @db.Date
-  senha           String     @db.VarChar(45)
-  avaliacao       avaliacao?
+  idCliente Int        @id @unique(map: "idCliente_UNIQUE") @default(autoincrement())
+  cpf       Int        @unique(map: "cpf_UNIQUE")
+  nome      String     @db.VarChar(77)
+  email     String     @unique(map: "email_UNIQUE") @db.VarChar(70)
+  dataNasc  DateTime   @unique(map: "dataNasc_UNIQUE") @db.Date
+  senha     String     @db.VarChar(70)
+  avaliacao avaliacao?
 }
 
 model freelancer {
-  idfreelancer    Int        @id @default(autoincrement())
-  cpf             Int        @unique(map: "CPF_UNIQUE")
-  nome            String     @db.VarChar(77)
-  email           String     @unique(map: "email_UNIQUE") @db.VarChar(70)
-  data_nascimento DateTime   @db.Date
-  senha           String     @db.VarChar(45)
-  avaliacao       avaliacao?
-  servico         servico?
+  idFreelancer Int        @id @unique(map: "idfreelancer_UNIQUE") @default(autoincrement())
+  nome         String     @db.VarChar(77)
+  cpf          Int        @unique(map: "cpf_UNIQUE")
+  dataNasc     DateTime   @db.Date
+  senha        String     @db.VarChar(70)
+  email        String     @unique(map: "email_UNIQUE") @db.VarChar(70)
+  avaliacao    avaliacao?
+  servico      servico?
 }
 
 model servico {
-  categoria_idcategoria   Int        @unique(map: "categoria_idcategoria_UNIQUE") @default(autoincrement())
-  freelancer_idfreelancer Int        @unique(map: "freelancer_idfreelancer_UNIQUE")
-  descricao               String     @db.VarChar(400)
-  idservico               Int        @unique(map: "idservico_UNIQUE")
-  categoria               categoria  @relation(fields: [categoria_idcategoria], references: [idcategoria], onDelete: NoAction, onUpdate: NoAction, map: "fk_categoria_has_freelancer_categoria1")
-  freelancer              freelancer @relation(fields: [freelancer_idfreelancer], references: [idfreelancer], onDelete: NoAction, onUpdate: NoAction, map: "fk_categoria_has_freelancer_freelancer1")
+  idServico               Int        @unique(map: "idServico_UNIQUE") @default(autoincrement())
+  freelancer_idFreelancer Int        @unique(map: "freelancer_idFreelancer_UNIQUE")
+  categoria_idCategoria   Int        @unique(map: "categoria_idCategoria_UNIQUE")
+  decricao                String     @db.VarChar(200)
+  categoria               categoria  @relation(fields: [categoria_idCategoria], references: [idCategoria], onDelete: NoAction, onUpdate: NoAction, map: "fk_freelancer_has_categoria_categoria1")
+  freelancer              freelancer @relation(fields: [freelancer_idFreelancer], references: [idFreelancer], onDelete: NoAction, onUpdate: NoAction, map: "fk_freelancer_has_categoria_freelancer")
 
-  @@id([categoria_idcategoria, freelancer_idfreelancer, idservico])
-  @@index([categoria_idcategoria], map: "fk_categoria_has_freelancer_categoria1_idx")
-  @@index([freelancer_idfreelancer], map: "fk_categoria_has_freelancer_freelancer1_idx")
+  @@id([idServico, freelancer_idFreelancer, categoria_idCategoria])
+  @@index([categoria_idCategoria], map: "fk_freelancer_has_categoria_categoria1_idx")
+  @@index([freelancer_idFreelancer], map: "fk_freelancer_has_categoria_freelancer_idx")
 }

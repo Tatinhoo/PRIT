@@ -31,7 +31,7 @@ export const ClienteController = {
             const{
                 nome,
                 cpf,
-                data_nascimento,
+                dataNasc,
                 email,
                 senha,
                 avaliacao
@@ -40,7 +40,7 @@ export const ClienteController = {
                 data: {
                     nome,
                     cpf,
-                    data_nascimento,
+                    dataNasc,
                     email,
                     senha,
                     avaliacao
@@ -116,7 +116,7 @@ export const ClienteController = {
 
             const clienteDeletado = await prisma.cliente.delete({
                 where: {
-                    idcliente: idBusca
+                    idCliente: idBusca
                 }
             })
 
@@ -134,7 +134,7 @@ export const ClienteController = {
 
             const clienteResultado = await prisma.cliente.findUnique({
                 where: {
-                    idcliente: idBusca
+                    idCliente: idBusca
                 }
             })
 
@@ -147,7 +147,7 @@ export const ClienteController = {
     },
    async getByCPF(requisicao: Request, resposta: Response):Promise<any>{
         try {
-            const cpfBusca:string = requisicao.params.cpf
+            const cpfBusca:number =  parseInt(requisicao.params.cpf)
 
             const clienteResultado = await prisma.cliente.findUnique({
                 where: {
