@@ -1,16 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 
-interface Freelancer {
-    readonly idFreelancer: number,
-    nome: string,
-    cpf: number,
-    dataNasc: string,
-    senha: string,
-    email: string
-}
-
-let freelancers: Freelancer[] = []
 const prisma = new PrismaClient();
 
 export const FreelancerController = {

@@ -1,13 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 
-interface Categoria {
-    readonly id: number
-    nome: string
-}
-
-
-let categorias: Categoria[] = []
 const prisma = new PrismaClient();
 
 export const CategoriaController = {

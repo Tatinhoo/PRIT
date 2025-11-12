@@ -6,4 +6,4 @@ import { FreelancerController } from "../controllers/FreelancerController";
 const router = Router()
 
 router.get("/freelancers", FreelancerController.getAll)
-router.post("freelancers", FreelancerController.create)
+router.post("/freelancers", FreelancerController.create)

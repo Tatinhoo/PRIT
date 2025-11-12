@@ -1,17 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 
-interface Cliente {
-    readonly idCliente: number
-    nome: string
-    dataNasc: string
-    email: string
-    cpf: string
-    senha: string
-}
-
-let clientes: Cliente[] = []
-
 const prisma = new PrismaClient();
 
 export const ClienteController = {
@@ -76,61 +65,54 @@ export const ClienteController = {
     async update(requesicao: Request, resposta: Response): Promise<any> {
         
         try {
+
             
-        
-
-        const { id } = requesicao.params
+        const idCliente = requesicao.params.id
         const { nome, dataNasc, email, cpf, senha } = requesicao.body
-
-        if (!id) {
-            return resposta.status(400).json({ error: "Não há Cliente com esse id" })
-        }
-        else {
-            const idBusca: number = parseInt(id)
-            const ClienteBusca: number | undefined = clientes.findIndex(item => item.idCliente == idBusca)
-
-            if (ClienteBusca == -1 || ClienteBusca == undefined) {
-                return resposta.status(400).json({ error: "Id invalido" })
+        console.log(idCliente);
+        const clienteBusca = await prisma.cliente.update({
+            where: {
+                idCliente: parseInt(idCliente),
+            },
+            data: {
+                nome,
+                dataNasc,
+                email,
+                cpf,
+                senha
             }
-            else {
-                clientes[ClienteBusca] = {
-                    idCliente: idBusca,
-                    nome,
-                    dataNasc,
-                    email,
-                    cpf,
-                    senha
-                }
-                return resposta.status(200).json(clientes[ClienteBusca])
-            }
-        }
+        })
+        return resposta.status(200).json(clienteBusca)
+
         } catch (error) {
             console.log("Houve um erro " + error)   
         }
 
     },
 
-     async delete(requisicao: Request, resposta: Response):Promise<any>{
+    async delete(requisicao: Request, resposta: Response): Promise<any> {
         try {
-            const idBusca:number = parseInt(requisicao.params.idCliente)
+            const idCliente = requisicao.params.id; // Ensure you're using the correct id field name
+            const idBusca: number = parseInt(idCliente); // Ensure it's a valid number
+            console.log(idBusca)
 
             const clienteDeletado = await prisma.cliente.delete({
                 where: {
-                    idCliente: idBusca
+                    idCliente: idBusca // Use idCliente to match your Prisma schema
                 }
-            })
+            });
 
-            return resposta.json(clienteDeletado)
-            
+            return resposta.json(clienteDeletado);
         } catch (error) {
-            console.log(error)
-            resposta.status(500).json({error: "Error ao deletar o aluno"})
+            console.log(error);
+            resposta.status(500).json({ error: "Error ao deletar o cliente" });
         }
     },
 
     async getById(requisicao: Request, resposta: Response):Promise<any>{
         try {
-            const idBusca:number = parseInt(requisicao.params.idCliente)
+            const idCliente = requisicao.params.id
+            const idBusca: number = parseInt(idCliente);
 
             const clienteResultado = await prisma.cliente.findUnique({
                 where: {
@@ -142,7 +124,7 @@ export const ClienteController = {
             
         } catch (error) {
             console.log(error)
-            resposta.status(500).json({error: "Error ao buscar o aluno pelo id"})
+            resposta.status(500).json(error)
         }
     },
    async getByCPF(requisicao: Request, resposta: Response):Promise<any>{

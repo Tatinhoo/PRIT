@@ -3,7 +3,6 @@ import cors from "cors"
 import ClienteRotas from "./routes/ClienteRotas"
 import CategoriaRotas from "./routes/CategoriaRotas"
 
-
 const app = express()
 
 const porta = 3000

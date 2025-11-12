@@ -42,7 +42,7 @@ model cliente {
   cpf       Int        @unique(map: "cpf_UNIQUE")
   nome      String     @db.VarChar(77)
   email     String     @unique(map: "email_UNIQUE") @db.VarChar(70)
-  dataNasc  DateTime   @unique(map: "dataNasc_UNIQUE") @db.Date
+  dataNasc  DateTime   @db.Date
   senha     String     @db.VarChar(70)
   avaliacao avaliacao?
 }
@@ -62,11 +62,11 @@ model servico {
   idServico               Int        @unique(map: "idServico_UNIQUE") @default(autoincrement())
   freelancer_idFreelancer Int        @unique(map: "freelancer_idFreelancer_UNIQUE")
   categoria_idCategoria   Int        @unique(map: "categoria_idCategoria_UNIQUE")
-  decricao                String     @db.VarChar(200)
+  descricao               String     @db.VarChar(200)
   categoria               categoria  @relation(fields: [categoria_idCategoria], references: [idCategoria], onDelete: NoAction, onUpdate: NoAction, map: "fk_freelancer_has_categoria_categoria1")
   freelancer              freelancer @relation(fields: [freelancer_idFreelancer], references: [idFreelancer], onDelete: NoAction, onUpdate: NoAction, map: "fk_freelancer_has_categoria_freelancer")
 
-  @@id([idServico, freelancer_idFreelancer, categoria_idCategoria])
+  @@id([idServico])
   @@index([categoria_idCategoria], map: "fk_freelancer_has_categoria_categoria1_idx")
   @@index([freelancer_idFreelancer], map: "fk_freelancer_has_categoria_freelancer_idx")
 }
